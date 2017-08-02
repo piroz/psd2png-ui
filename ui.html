@@ -1,0 +1,120 @@
+<html>
+<head>
+<style>
+@import url(https://fonts.googleapis.com/css?family=Lato);
+* {
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-family: Lato, sans-serif;
+    background: #ccc;
+}
+#drop-area {
+    position: relative;
+    width: 80%;
+    height: 80%;
+    margin: 0 auto;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #000;
+    color: #ccc;
+    text-align: center;
+    font-size: 1.5em;
+    line-height: 2em;
+}
+#overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    color: #000;
+    background: #ccc;
+    z-index: 999;
+    text-align: center;
+    font-size: 1.5em;
+    line-height: 2em;
+}
+</style>
+</head>
+<body>
+<div id="drop-area" ondragover="event.preventDefault()" ondrop="handleDrop(event)">
+    Drop PSD Files Here!!
+</div>
+<div id="overlay" ondragover="event.preventDefault()" ondragend="event.preventDefault()" ondrop="event.preventDefault()">
+    In progress!
+</div>
+<script>
+const electron = require("electron");
+const ipcRenderer = electron.ipcRenderer;
+const {dialog} = electron.remote
+
+let savepath;
+let inProgress = false;
+
+ipcRenderer.on("convert-end", (ev) => {
+    unlock();
+});
+
+function unlock() {
+    inProgress = false;
+}
+
+function lock() {
+    if (inProgress) {
+        return false;
+    }
+
+    inProgress = true;
+
+    return true;
+}
+
+function savePathDialog() {
+    savepath = dialog.showOpenDialog({
+        title: "書き出し先ディレクトリ",
+        buttonLabel: "決定",
+        defaultPath: require('os').homedir(),
+        properties: [ "openDirectory" ],
+        message: "書き出し先ディレクトリを選択して下さい"
+    });
+
+    ipcRenderer.send("update-savepath", savepath);
+}
+
+function handleDrop(e) {
+
+    e.stopPropagation();
+    e.preventDefault();
+
+    if (false === lock()) {
+        return false;
+    }
+
+    if (!savepath) {
+        savePathDialog();
+    }
+
+    let files = e.dataTransfer.files;
+
+    let psdfiles = [];
+
+    for (let i = 0, f; f = files[i]; i++) {
+        if (f.name.match(/psd$/) === null) {
+            continue;
+        }
+
+        psdfiles.push(f.path);
+    }
+
+    if (psdfiles.length > 0) {
+        ipcRenderer.send("convert-files", psdfiles);
+    } else {
+        unlock();
+    }
+}
+</script>
+</body>
+</html>

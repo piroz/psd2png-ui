@@ -1,0 +1,31 @@
+{
+  "private": true,
+  "name": "psd2png-ui",
+  "version": "0.0.1",
+  "description": "psd2png app",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "make:app": "node packager/darwin.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/piroz/psd2png-ui.git"
+  },
+  "keywords": [
+    "psd"
+  ],
+  "author": "piroz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/piroz/psd2png-ui/issues"
+  },
+  "homepage": "https://github.com/piroz/psd2png-ui#readme",
+  "dependencies": {
+    "electron": "^1.6.11",
+    "psd": "^3.2.0"
+  },
+  "devDependencies": {
+    "electron-packager": "^8.7.2"
+  }
+}
