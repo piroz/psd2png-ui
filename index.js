@@ -9,7 +9,7 @@ function createWindow() {
         height: 100
     });
 
-    win.loadURL(`file://${__dirname}/ui.html`);
+    win.loadURL(`file://${__dirname}/front/dist/index.html`);
 
     win.focus();
 

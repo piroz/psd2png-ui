@@ -47,6 +47,10 @@ body {
     In progress!
 </div>
 <script>
+const Controller = require("./controller");
+
+console.dir(new Controller);
+
 const electron = require("electron");
 const ipcRenderer = electron.ipcRenderer;
 const {dialog} = electron.remote

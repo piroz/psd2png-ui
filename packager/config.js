@@ -14,7 +14,7 @@ const config = {
   asar: true,
   prune: true,
   // 無視ファイル
-  ignore: "node_modules/(electron-packager|electron-prebuilt|\.bin)",
+  ignore: "node_modules/(electron-packager|electron-prebuilt|\.bin)|front/src",
 };
 
 module.exports = config;

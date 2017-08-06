@@ -1,0 +1,73 @@
+@import url(https://fonts.googleapis.com/css?family=Lato);
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Lato, sans-serif;
+    background: #ccc;
+}
+
+@mixin keyframes($animation-name) {
+    @-webkit-keyframes #{$animation-name} {
+        @content;
+    }
+    @-moz-keyframes #{$animation-name} {
+        @content;
+    } 
+    @keyframes #{$animation-name} {
+        @content;
+    }
+}
+
+@mixin animation($animation-name, $duration) {
+    -webkit-animation: $animation-name;
+    -moz-animation: $animation-name;
+    animation: $animation-name;
+    -webkit-animation-fill-mode: both;
+    -moz-animation-fill-mode: both;
+    animation-fill-mode: both;
+    -webkit-animation-duration: $duration;
+    -moz-animation-duration: $duration;
+    animation-duration: $duration;
+    -webkit-animation-timing-function: ease-in;
+    -moz-animation-timing-function: ease-in;
+    animation-timing-function: ease-in;
+    -webkit-animation-delay: 0s;
+    -moz-animation-delay: 0s;
+    animation-delay: 0s;
+    -webkit-animation-direction: forwards;
+    -moz-animation-direction: forwards;
+    animation-direction: forwards;
+    -webkit-animation-iteration-count: 1;
+    -moz-animation-iteration-count: 1;
+    animation-iteration-count: 1;
+}
+
+@include keyframes(fade-in){
+    0% {
+        opacity:0;
+    }
+    100% {
+        opacity:1;
+    }
+}
+
+@include keyframes(fade-out){
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+.fade-in {
+    @include animation(fade-in, 500ms);
+}
+
+.fade-out {
+    @include animation(fade-out, 500ms);
+}
