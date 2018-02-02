@@ -1,6 +1,7 @@
 const {app, BrowserWindow, ipcMain} = require("electron");
-const PSD = require('psd');
+const psd2png = require('psd2png')
 const path = require("path");
+const fs = require("fs");
 let win, savepath, queue = [];
 
 function createWindow() {
@@ -44,15 +45,39 @@ ipcMain.on("update-savepath", (ev, path) => {
   console.log("savepath update to: " + savepath);
 });
 
+const readFile = (path, opts = 'utf8') => {
+    return new Promise((res, rej) => {
+        fs.readFile(path, opts, (err, data) => {
+            if (err) rej(err)
+            else res(data)
+        })
+    });
+};
+
+const writeFile = (path, data, opts = 'utf8') => {
+    return new Promise((res, rej) => {
+        fs.writeFile(path, data, opts, (err) => {
+            if (err) rej(err)
+            else res()
+        })
+    });
+};
+
+console.dir(readFile);
+
+
 ipcMain.on("convert-files", (ev, files) => {
-  
+  console.dir(files);
   for (let i = 0, f; f = files[i]; i++) {
     let basename = path.basename(f, ".psd");
     let lastLoop = i + 1 == files.length;
-    let psd = PSD.fromFile(f);
-    psd.parse();
 
-    psd.image.saveAsPng(savepath + "/" + basename + ".png");
+    
+    const buffer = await readFile(f)
+
+    let pngbuffer = psd2png(buffer);
+
+    await writeFile(savepath + "/" + basename + ".png", pngbuffer);
 
     if (lastLoop) {
       win.webContents.send("convert-end");

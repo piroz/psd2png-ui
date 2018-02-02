@@ -11,12 +11,11 @@ body {
     background: #ccc;
 }
 #drop-area {
-    position: relative;
-    width: 80%;
-    height: 80%;
-    margin: 0 auto;
-    top: 50%;
-    transform: translateY(-50%);
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
     background: #000;
     color: #ccc;
     text-align: center;
@@ -40,7 +39,7 @@ body {
 </style>
 </head>
 <body>
-<div id="drop-area" ondragover="event.preventDefault()" ondrop="handleDrop(event)">
+<div id="drop-area">
     Drop PSD Files Here!!
 </div>
 <div id="overlay" ondragover="event.preventDefault()" ondragend="event.preventDefault()" ondrop="event.preventDefault()">
@@ -84,8 +83,13 @@ function savePathDialog() {
     ipcRenderer.send("update-savepath", savepath);
 }
 
-function handleDrop(e) {
+function handleOver(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+}
 
+function handleDrop(e) {
     e.stopPropagation();
     e.preventDefault();
 
@@ -98,6 +102,8 @@ function handleDrop(e) {
     }
 
     let files = e.dataTransfer.files;
+
+    console.dir(files);
 
     let psdfiles = [];
 
@@ -115,6 +121,49 @@ function handleDrop(e) {
         unlock();
     }
 }
+
+function handleFileSelect(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+
+    if (false === lock()) {
+        return false;
+    }
+
+    if (!savepath) {
+        savePathDialog();
+    }
+
+    let files = evt.dataTransfer.files;
+
+    let psdfiles = [];
+
+    for (let i = 0, f; f = files[i]; i++) {
+        if (f.name.match(/psd$/) === null) {
+            continue;
+        }
+
+        psdfiles.push(f.path);
+    }
+
+    if (psdfiles.length > 0) {
+        ipcRenderer.send("convert-files", psdfiles);
+    } else {
+        unlock();
+    }
+}
+
+function handleDragOver(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+}
+
+// Setup the dnd listeners.
+let dropZone = document.getElementById('drop-area');
+dropZone.addEventListener('dragover', handleDragOver, false);
+dropZone.addEventListener('drop', handleFileSelect, false);
+
 </script>
 </body>
 </html>
